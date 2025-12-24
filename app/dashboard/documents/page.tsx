@@ -22,7 +22,6 @@ import {
     User,
     Folder,
 } from 'lucide-react';
-import { useAuthStore } from '@/store/authStore';
 
 interface Document {
     id: string;
@@ -49,7 +48,6 @@ interface Document {
 
 export default function DocumentsPage() {
     const queryClient = useQueryClient();
-    const { user } = useAuthStore();
     const [projectFilter, setProjectFilter] = useState('all');
     const [typeFilter, setTypeFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -87,7 +85,7 @@ export default function DocumentsPage() {
             const response = await fetch('/api/documents', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, uploadedById: user?.id }),
+                body: JSON.stringify({ ...data, uploadedById: 'admin-user-id' }),
             });
             if (!response.ok) throw new Error('Failed to create document');
             return response.json();

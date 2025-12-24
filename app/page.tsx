@@ -83,14 +83,14 @@ export default function Home() {
                     {/* Main Branding */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                            <Image
+                            {/* <Image
                                 src="/tacc-logo.png"
                                 alt="TACC Logo"
                                 width={80}
                                 height={80}
                                 className="brightness-0 invert"
-                            />
-                            <h1 className="text-5xl font-bold">BuildFlow PMS</h1>
+                            /> */}
+                            <h1 className="text-5xl font-bold"> PMS</h1>
                         </div>
                         <p className="text-xl text-blue-100 max-w-md">
                             Manage your projects with precision
@@ -195,11 +195,7 @@ export default function Home() {
                                 </label>
                             </div>
 
-                            <div className="text-sm">
-                                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
-                                    Forgot password?
-                                </a>
-                            </div>
+                          
                         </div>
 
                         {/* Sign In Button */}
@@ -217,12 +213,12 @@ export default function Home() {
                                 <div className="w-full border-t border-gray-300"></div>
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-gray-50 text-gray-500">Or sign in with</span>
+                                <span className="px-2 bg-gray-50 text-gray-500">...</span>
                             </div>
                         </div>
 
                         {/* Social Login Buttons */}
-                        <div className="flex gap-4">
+                        {/* <div className="flex gap-4">
                             <button
                                 type="button"
                                 className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
@@ -246,7 +242,7 @@ export default function Home() {
                                     <path fill="#ffb900" d="M13 13h10v10H13z" />
                                 </svg>
                             </button>
-                        </div>
+                        </div> */}
                     </form>
                 </div>
             </div>
