@@ -63,5 +63,6 @@ USER appuser
 
 EXPOSE 3000
 
-# Run migrations only if DATABASE_URL is set, then start the app
-CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then npx prisma migrate deploy; fi && node server.js"]
+# Run migrations and start the app
+# Convert postgres:// to postgresql:// if needed for Prisma compatibility
+CMD ["sh", "-c", "export DATABASE_URL=$(echo $DATABASE_URL | sed 's/^postgres:/postgresql:/') && npx prisma migrate deploy && node server.js"]
