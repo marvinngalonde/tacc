@@ -15,8 +15,9 @@ FROM base AS deps
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
 
-# Install dependencies
-RUN npm ci --legacy-peer-deps
+# Install dependencies and generate Prisma client
+RUN npm ci --legacy-peer-deps && \
+    npx prisma generate
 
 # 3) Build stage
 FROM base AS builder
@@ -30,9 +31,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client and build Next.js app
-RUN npx prisma generate && \
-    npm run build
+# Build Next.js app (Prisma client already generated in deps stage)
+RUN npm run build
 
 # 4) Production runtime
 FROM base AS runner
@@ -53,9 +53,8 @@ COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./
 
-# Copy node_modules for Prisma client
-COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
+# Copy node_modules with Prisma client from deps stage
+COPY --from=deps /app/node_modules ./node_modules
 
 # Set ownership
 RUN chown -R appuser:appgroup /app
