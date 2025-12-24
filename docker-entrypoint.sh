@@ -30,7 +30,7 @@ EOF
 tail -n +12 /app/prisma/schema.prisma >> /tmp/schema.prisma
 
 # Run db push with the temporary schema
-npx prisma db push --schema=/tmp/schema.prisma --skip-generate
+npx prisma db push --schema=/tmp/schema.prisma
 
 # Check if seeding is requested
 if [ "$SEED_DATABASE" = "true" ]; then
