@@ -63,5 +63,6 @@ USER appuser
 
 EXPOSE 3000
 
-# Start the app (Prisma 7 with adapters doesn't use traditional migrations)
-CMD ["node", "server.js"]
+# Create/update database schema and optionally seed, then start the app
+# Set SEED_DATABASE=true in Coolify to run seed on first deployment
+CMD ["sh", "-c", "npx prisma db push && if [ \"$SEED_DATABASE\" = \"true\" ]; then npm run seed; fi && node server.js"]
