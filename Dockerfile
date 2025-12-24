@@ -63,6 +63,5 @@ USER appuser
 
 EXPOSE 3000
 
-# Run migrations and start the app
-# Convert postgres:// to postgresql:// if needed for Prisma compatibility
-CMD ["sh", "-c", "export DATABASE_URL=$(echo $DATABASE_URL | sed 's/^postgres:/postgresql:/') && npx prisma migrate deploy && node server.js"]
+# Start the app (Prisma 7 with adapters doesn't use traditional migrations)
+CMD ["node", "server.js"]
