@@ -63,5 +63,5 @@ USER appuser
 
 EXPOSE 3000
 
-# Run migrations and start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Run migrations only if DATABASE_URL is set, then start the app
+CMD ["sh", "-c", "if [ -n \"$DATABASE_URL\" ]; then npx prisma migrate deploy; fi && node server.js"]
