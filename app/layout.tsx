@@ -6,7 +6,7 @@ import { Providers } from "@/components/providers";
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: "BuildFlow PMS - Sign In",
+    title: "TACC PMS",
     description: "Manage your projects with precision",
 };
 

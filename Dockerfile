@@ -56,6 +56,10 @@ COPY --from=builder /app/package.json ./
 # Copy node_modules with Prisma client from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
+# Copy startup script
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
+
 # Set ownership
 RUN chown -R appuser:appgroup /app
 
@@ -63,6 +67,5 @@ USER appuser
 
 EXPOSE 3000
 
-# Create/update database schema and optionally seed, then start the app
-# Set SEED_DATABASE=true in Coolify to run seed on first deployment
-CMD ["sh", "-c", "npx prisma db push && if [ \"$SEED_DATABASE\" = \"true\" ]; then npm run seed; fi && node server.js"]
+# Use custom entrypoint script
+CMD ["/app/docker-entrypoint.sh"]
