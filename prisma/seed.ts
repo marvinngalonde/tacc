@@ -73,6 +73,7 @@ async function main() {
                 description: 'Complete foundation inspection before proceeding',
                 status: 'in-progress',
                 priority: 'critical',
+                startDate: new Date('2024-12-15'),
                 dueDate: new Date('2024-12-30'),
                 projectId: project1.id,
                 assigneeId: admin.id,
@@ -82,6 +83,7 @@ async function main() {
                 description: 'Install electrical systems on floors 1-5',
                 status: 'todo',
                 priority: 'high',
+                startDate: new Date('2025-01-02'),
                 dueDate: new Date('2025-01-15'),
                 projectId: project1.id,
                 assigneeId: admin.id,
@@ -91,6 +93,7 @@ async function main() {
                 description: 'Install HVAC systems',
                 status: 'in-progress',
                 priority: 'critical',
+                startDate: new Date('2024-12-20'),
                 dueDate: new Date('2024-12-28'),
                 projectId: project2.id,
                 assigneeId: admin.id,
@@ -128,6 +131,94 @@ async function main() {
     });
 
     console.log('✅ Created sample activities');
+
+    // Create sample resources
+    await prisma.resource.createMany({
+        data: [
+            {
+                name: 'CAT 320 Excavator',
+                type: 'equipment',
+                description: 'Heavy-duty excavator for large-scale digging operations',
+                quantity: 3,
+                available: 1,
+                cost: 250000,
+            },
+            {
+                name: 'Concrete Mixer',
+                type: 'equipment',
+                description: 'Industrial concrete mixer for on-site mixing',
+                quantity: 5,
+                available: 3,
+                cost: 15000,
+            },
+            {
+                name: 'Dump Truck',
+                type: 'vehicle',
+                description: '10-wheel dump truck for material transport',
+                quantity: 4,
+                available: 2,
+                cost: 85000,
+            },
+            {
+                name: 'Forklift',
+                type: 'vehicle',
+                description: '5-ton capacity forklift',
+                quantity: 6,
+                available: 5,
+                cost: 35000,
+            },
+            {
+                name: 'Steel Beams',
+                type: 'material',
+                description: 'I-beam steel for structural support',
+                quantity: 200,
+                available: 85,
+                cost: 450,
+            },
+            {
+                name: 'Cement Bags',
+                type: 'material',
+                description: '50kg Portland cement bags',
+                quantity: 500,
+                available: 120,
+                cost: 12,
+            },
+            {
+                name: 'Safety Helmets',
+                type: 'safety',
+                description: 'OSHA-approved hard hats',
+                quantity: 100,
+                available: 78,
+                cost: 25,
+            },
+            {
+                name: 'Safety Harnesses',
+                type: 'safety',
+                description: 'Fall protection harnesses',
+                quantity: 50,
+                available: 32,
+                cost: 85,
+            },
+            {
+                name: 'Scaffolding Units',
+                type: 'equipment',
+                description: 'Modular scaffolding system',
+                quantity: 20,
+                available: 8,
+                cost: 1200,
+            },
+            {
+                name: 'Power Generator',
+                type: 'equipment',
+                description: '100kW diesel generator',
+                quantity: 3,
+                available: 0,
+                cost: 45000,
+            },
+        ],
+    });
+
+    console.log('✅ Created sample resources');
 
     console.log('🎉 Database seeded successfully!');
 }

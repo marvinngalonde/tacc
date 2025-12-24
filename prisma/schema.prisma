@@ -26,6 +26,7 @@ model User {
   teams        TeamMember[]
   activities   Activity[]
   createdProjects Project[] @relation("ProjectCreator")
+  documents    Document[]
 }
 
 model Project {
@@ -77,6 +78,7 @@ model Task {
   description String?
   status      String   @default("todo") // todo, in-progress, review, completed
   priority    String   @default("medium") // low, medium, high, critical
+  startDate   DateTime?
   dueDate     DateTime?
   completedAt DateTime?
   createdAt   DateTime @default(now())
@@ -142,6 +144,7 @@ model Document {
   id          String   @id @default(cuid())
   name        String
   type        String   // pdf, doc, image, etc.
+  description String?
   url         String
   size        Int?
   createdAt   DateTime @default(now())
@@ -150,8 +153,12 @@ model Document {
   projectId   String
   project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  uploadedById String
+  uploadedBy   User    @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
   @@index([projectId])
   @@index([type])
+  @@index([uploadedById])
 }
 
 model Activity {

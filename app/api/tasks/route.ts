@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
         const status = searchParams.get('status');
         const priority = searchParams.get('priority');
         const projectId = searchParams.get('projectId');
+        const search = searchParams.get('search');
         const sortBy = searchParams.get('sortBy') || 'dueDate';
         const sortOrder = (searchParams.get('sortOrder') || 'asc') as 'asc' | 'desc';
 
@@ -23,6 +24,13 @@ export async function GET(request: NextRequest) {
 
         if (projectId) {
             where.projectId = projectId;
+        }
+
+        if (search) {
+            where.OR = [
+                { title: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+            ];
         }
 
         // Build orderBy clause
