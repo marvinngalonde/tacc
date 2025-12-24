@@ -14,8 +14,8 @@ export DATABASE_URL=$(echo $DATABASE_URL | sed 's/^postgres:/postgresql:/')
 
 echo "📦 Setting up database schema..."
 
-# Run db push (uses prisma.config.ts for URL)
-npx prisma db push
+# Run db push with explicit config path
+npx prisma db push --config=./prisma.config.ts
 
 # Check if seeding is requested
 if [ "$SEED_DATABASE" = "true" ]; then
