@@ -82,10 +82,15 @@ export default function DocumentsPage() {
 
     const createMutation = useMutation({
         mutationFn: async (data: Partial<Document>) => {
+            // Get the first user from database as uploader
+            const usersResponse = await fetch('/api/users');
+            const users = await usersResponse.json();
+            const uploaderId = users[0]?.id || 'admin-user-id';
+
             const response = await fetch('/api/documents', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...data, uploadedById: 'admin-user-id' }),
+                body: JSON.stringify({ ...data, uploadedById: uploaderId }),
             });
             if (!response.ok) throw new Error('Failed to create document');
             return response.json();
@@ -446,7 +451,15 @@ function DocumentFormDialog({
     onSubmit: (data: Partial<Document>) => void;
     isLoading: boolean;
 }) {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        name: string;
+        type: string;
+        description: string;
+        url: string;
+        size: string;
+        projectId: string;
+        file?: File;
+    }>({
         name: document?.name || '',
         type: document?.type || 'pdf',
         description: document?.description || '',
@@ -457,14 +470,50 @@ function DocumentFormDialog({
 
     if (!document) return null;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Convert size from string to number before submitting
-        const submitData: Partial<Document> = {
-            ...formData,
-            size: formData.size ? parseInt(formData.size) : null,
-        };
-        onSubmit(submitData);
+
+        if (formData.file) {
+            // Upload file first
+            const uploadFormData = new FormData();
+            uploadFormData.append('file', formData.file);
+
+            try {
+                const uploadResponse = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: uploadFormData,
+                });
+
+                if (!uploadResponse.ok) throw new Error('File upload failed');
+
+                const { url, size } = await uploadResponse.json();
+
+                // Submit document with uploaded file URL
+                const submitData: Partial<Document> = {
+                    name: formData.name,
+                    type: formData.type,
+                    description: formData.description || null,
+                    url,
+                    size,
+                    projectId: formData.projectId,
+                };
+                onSubmit(submitData);
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Failed to upload file');
+            }
+        } else {
+            // No new file, just update metadata
+            const submitData: Partial<Document> = {
+                name: formData.name,
+                type: formData.type,
+                description: formData.description || null,
+                url: formData.url,
+                size: formData.size ? parseInt(formData.size) : null,
+                projectId: formData.projectId,
+            };
+            onSubmit(submitData);
+        }
     };
 
     return (
@@ -527,25 +576,30 @@ function DocumentFormDialog({
                         </div>
 
                         <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">File URL *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {document.id ? 'Replace File (optional)' : 'Upload File *'}
+                            </label>
                             <input
-                                type="url"
-                                required
-                                value={formData.url}
-                                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                                type="file"
+                                required={!document.id}
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setFormData({
+                                            ...formData,
+                                            url: file.name,
+                                            file: file
+                                        });
+                                    }
+                                }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="https://example.com/document.pdf"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.dwg"
                             />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">File Size (bytes)</label>
-                            <input
-                                type="number"
-                                value={formData.size}
-                                onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                            {formData.url && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                    Selected: {formData.url}
+                                </p>
+                            )}
                         </div>
 
                         <div className="col-span-2">
