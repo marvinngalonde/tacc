@@ -151,8 +151,8 @@ export default function ResourcesPage() {
                                 key={type}
                                 onClick={() => setTypeFilter(type)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${typeFilter === type
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -254,10 +254,10 @@ export default function ResourcesPage() {
                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
                                             className={`h-2 rounded-full transition-all ${resource.available === 0
-                                                    ? 'bg-red-500'
-                                                    : resource.available < resource.quantity * 0.3
-                                                        ? 'bg-orange-500'
-                                                        : 'bg-green-500'
+                                                ? 'bg-red-500'
+                                                : resource.available < resource.quantity * 0.3
+                                                    ? 'bg-orange-500'
+                                                    : 'bg-green-500'
                                                 }`}
                                             style={{ width: `${(resource.available / resource.quantity) * 100}%` }}
                                         ></div>
@@ -372,7 +372,16 @@ function ResourceFormDialog({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(formData);
+        // Convert string fields to numbers before submitting
+        const submitData: Partial<Resource> = {
+            name: formData.name,
+            type: formData.type,
+            description: formData.description || null,
+            quantity: parseInt(formData.quantity),
+            available: parseInt(formData.available),
+            cost: formData.cost ? parseFloat(formData.cost) : null,
+        };
+        onSubmit(submitData);
     };
 
     return (

@@ -459,7 +459,12 @@ function DocumentFormDialog({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSubmit(formData);
+        // Convert size from string to number before submitting
+        const submitData: Partial<Document> = {
+            ...formData,
+            size: formData.size ? parseInt(formData.size) : null,
+        };
+        onSubmit(submitData);
     };
 
     return (
@@ -589,7 +594,7 @@ function ViewDocumentDialog({
     document: Document;
     onClose: () => void;
     onEdit: () => void;
-    getFileIcon: (type: string) => JSX.Element;
+    getFileIcon: (type: string) => React.ReactElement;
     formatFileSize: (bytes: number | null) => string;
     formatDate: (dateString: string) => string;
 }) {
