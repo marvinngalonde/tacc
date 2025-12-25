@@ -15,9 +15,10 @@ import {
     BarChart3,
     FileText,
     Settings,
-    Menu,
     Calendar,
     Bell,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 
 const navigation = [
@@ -67,22 +68,25 @@ export default function DashboardLayout({
         router.push('/');
     };
 
+    // Flatten navigation items for easy lookup
+    const navItems = navigation.flatMap(section => section.items);
+
     return (
-        <div className="flex h-screen bg-gray-100 overflow-hidden">
+        <div className="flex h-screen bg-gray-50 overflow-hidden">
             {/* Sidebar */}
             <div
-                className={`bg-blue-900 text-white flex flex-col transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'
+                className={`bg-white flex flex-col transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'
                     }`}
             >
                 {/* Logo */}
-                <div className="p-4 flex items-center justify-start border-b border-blue-800 h-16">
+                <div className="p-4 flex items-center justify-start h-16">
                     {!isCollapsed ? (
                         <Image
                             src="/tacc-logo.png"
                             alt="TACC Logo"
                             width={120}
                             height={33}
-                            className="brightness-0 invert"
+                            className="object-contain"
                         />
                     ) : (
                         <Image
@@ -90,19 +94,41 @@ export default function DashboardLayout({
                             alt="TACC"
                             width={40}
                             height={40}
-                            className="brightness-0 invert"
+                            className="object-contain"
                         />
                     )}
                 </div>
 
                 {/* Navigation */}
                 <nav className="flex-1 p-3 space-y-4 overflow-y-auto sidebar-scroll">
-                    {navigation.map((section) => (
+                    {navigation.map((section, sectionIndex) => (
                         <div key={section.group}>
                             {!isCollapsed && (
-                                <h3 className="text-[10px] font-semibold text-blue-300 uppercase tracking-wider mb-2 px-3">
-                                    {section.group}
-                                </h3>
+                                <div className="flex items-center justify-between mb-2 px-3">
+                                    <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
+                                        {section.group}
+                                    </h3>
+                                    {sectionIndex === 0 && (
+                                        <button
+                                            onClick={() => setIsCollapsed(!isCollapsed)}
+                                            className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                            title="Collapse sidebar"
+                                        >
+                                            <ChevronLeft className="w-4 h-4 text-gray-500" />
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                            {isCollapsed && sectionIndex === 0 && (
+                                <div className="flex justify-center mb-2">
+                                    <button
+                                        onClick={() => setIsCollapsed(!isCollapsed)}
+                                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                                        title="Expand sidebar"
+                                    >
+                                        <ChevronRight className="w-4 h-4 text-gray-500" />
+                                    </button>
+                                </div>
                             )}
                             <div className="space-y-1">
                                 {section.items.map((item) => {
@@ -113,8 +139,8 @@ export default function DashboardLayout({
                                             key={item.name}
                                             href={item.href}
                                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${isActive
-                                                ? 'bg-blue-800 text-white'
-                                                : 'text-blue-100 hover:bg-blue-800/50'
+                                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                                : 'text-gray-700 hover:bg-gray-100'
                                                 }`}
                                             title={isCollapsed ? item.name : undefined}
                                         >
@@ -129,25 +155,25 @@ export default function DashboardLayout({
                 </nav>
 
                 {/* User Profile */}
-                <div className="p-3 border-t border-blue-800">
+                <div className="p-3 border-t border-gray-200">
                     {!isCollapsed ? (
                         <>
                             <div className="flex items-center gap-2 mb-3">
-                                <div className="w-9 h-9 bg-blue-700 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <span className="text-sm font-semibold">
+                                <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span className="text-sm font-semibold text-white">
                                         {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase()}
                                     </span>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium truncate">
+                                    <p className="text-xs font-medium truncate text-gray-900">
                                         {user?.firstName} {user?.lastName}
                                     </p>
-                                    <p className="text-[10px] text-blue-300 truncate">{user?.email}</p>
+                                    <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
                                 </div>
                             </div>
                             <button
                                 onClick={handleLogout}
-                                className="w-full px-3 py-2 bg-blue-800 hover:bg-blue-700 rounded-lg text-xs transition-colors"
+                                className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs transition-colors"
                             >
                                 Logout
                             </button>
@@ -155,7 +181,7 @@ export default function DashboardLayout({
                     ) : (
                         <button
                             onClick={handleLogout}
-                            className="w-full p-2 bg-blue-800 hover:bg-blue-700 rounded-lg transition-colors"
+                            className="w-full p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                             title="Logout"
                         >
                             <span className="text-lg">🚪</span>
@@ -167,18 +193,11 @@ export default function DashboardLayout({
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Fixed Header */}
-                <header className="bg-white shadow-sm h-16 flex-shrink-0">
+                <header className="bg-white h-16 flex-shrink-0">
                     <div className="flex items-center justify-between px-6 h-full">
-                        <div className="flex items-center gap-4">
-                            {/* Hamburger Menu */}
-                            <button
-                                onClick={() => setIsCollapsed(!isCollapsed)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                <Menu className="w-5 h-5 text-gray-600" />
-                            </button>
-
-                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900">
+                            {navItems.find(item => item.href === pathname)?.name || 'Dashboard'}
+                        </h2>
                         <div className="flex items-center gap-3">
                             <button className="p-2 hover:bg-gray-100 rounded-lg relative">
                                 <Calendar className="w-5 h-5 text-gray-600" />
