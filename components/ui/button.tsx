@@ -45,7 +45,7 @@ export function Button({
             whileTap={{ scale: 0.98 }}
             className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
             disabled={disabled || isLoading}
-            {...props}
+            {...(props as any)}
         >
             {isLoading ? (
                 <>

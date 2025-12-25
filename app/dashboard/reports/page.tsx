@@ -326,7 +326,7 @@ function ProjectStatusReport({ projects }: { projects: any[] }) {
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
                                 outerRadius={80}
                                 fill="#8884d8"
                                 dataKey="value"
@@ -347,9 +347,9 @@ function ProjectStatusReport({ projects }: { projects: any[] }) {
                                 <div className="flex items-center justify-between">
                                     <span className="font-medium text-gray-900">{project.name}</span>
                                     <span className={`px-2 py-1 rounded text-xs font-medium ${project.status === 'active' ? 'bg-blue-100 text-blue-700' :
-                                            project.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                                project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-700' :
-                                                    'bg-red-100 text-red-700'
+                                        project.status === 'completed' ? 'bg-green-100 text-green-700' :
+                                            project.status === 'on-hold' ? 'bg-yellow-100 text-yellow-700' :
+                                                'bg-red-100 text-red-700'
                                         }`}>
                                         {project.status}
                                     </span>
@@ -429,7 +429,7 @@ function ResourceUtilizationReport({ tasks }: { tasks: any[] }) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
@@ -478,7 +478,7 @@ function TaskCompletionReport({ tasks }: { tasks: any[] }) {
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                label={({ name, percent }) => `${name}: ${percent ? (percent * 100).toFixed(0) : 0}%`}
                                 outerRadius={80}
                                 fill="#8884d8"
                                 dataKey="value"
