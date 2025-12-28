@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Users, Plus, Edit, Trash2, X, Search, UserPlus } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Team {
     id: string;
@@ -47,7 +48,7 @@ export default function TeamsPage() {
             const params = new URLSearchParams();
             if (projectFilter !== 'all') params.append('projectId', projectFilter);
 
-            const response = await fetch(`/api/teams?${params.toString()}`);
+            const response = await fetch(`/ api / teams ? ${params.toString()} `);
             if (!response.ok) throw new Error('Failed to fetch teams');
             return response.json();
         },
@@ -93,13 +94,17 @@ export default function TeamsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['teams'] });
             setShowAddDialog(false);
+            toast.success('Team created successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to create team');
         },
     });
 
     // Update team mutation
     const updateMutation = useMutation({
         mutationFn: async ({ id, data }: { id: string; data: Partial<Team> & { memberIds?: string[] } }) => {
-            const response = await fetch(`/api/teams/${id}`, {
+            const response = await fetch(`/ api / teams / ${id} `, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
@@ -110,13 +115,17 @@ export default function TeamsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['teams'] });
             setEditTeam(null);
+            toast.success('Team updated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to update team');
         },
     });
 
     // Delete team mutation
     const deleteMutation = useMutation({
         mutationFn: async (id: string) => {
-            const response = await fetch(`/api/teams/${id}`, {
+            const response = await fetch(`/ api / teams / ${id} `, {
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error('Failed to delete team');
@@ -125,6 +134,10 @@ export default function TeamsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['teams'] });
             setDeleteConfirm(null);
+            toast.success('Team deleted successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to delete team');
         },
     });
 
@@ -257,7 +270,7 @@ export default function TeamsPage() {
                                             <div
                                                 key={member.id}
                                                 className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold border-2 border-white"
-                                                title={`${member.user.firstName} ${member.user.lastName}`}
+                                                title={`${member.user.firstName} ${member.user.lastName} `}
                                             >
                                                 {member.user.firstName[0]}{member.user.lastName[0]}
                                             </div>

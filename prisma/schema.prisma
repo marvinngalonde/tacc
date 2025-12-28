@@ -1,57 +1,50 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  firstName String?
-  lastName  String?
-  role      String   @default("user")
-  avatar    String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  projects     ProjectMember[] @relation("UserProjects")
-  tasks        Task[]
-  teams        TeamMember[]
-  activities   Activity[]
-  createdProjects Project[] @relation("ProjectCreator")
-  documents    Document[]
+  id              String          @id @default(cuid())
+  email           String          @unique
+  password        String
+  firstName       String?
+  lastName        String?
+  role            String          @default("user")
+  avatar          String?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  activities      Activity[]
+  documents       Document[]
+  createdProjects Project[]       @relation("ProjectCreator")
+  projects        ProjectMember[] @relation("UserProjects")
+  tasks           Task[]
+  teams           TeamMember[]
 }
 
 model Project {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   name        String
   description String?
-  status      String   @default("active") // active, completed, on-hold, cancelled
+  status      String          @default("active")
   budget      Float?
-  spent       Float    @default(0)
+  spent       Float           @default(0)
   startDate   DateTime?
   endDate     DateTime?
   location    String?
   latitude    Float?
   longitude   Float?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   creatorId   String
-  creator     User     @relation("ProjectCreator", fields: [creatorId], references: [id])
-  
+  activities  Activity[]
+  documents   Document[]
+  creator     User            @relation("ProjectCreator", fields: [creatorId], references: [id])
+  members     ProjectMember[]
   tasks       Task[]
   teams       Team[]
-  documents   Document[]
-  activities  Activity[]
-  members     ProjectMember[]
 
   @@index([status])
   @@index([creatorId])
@@ -61,9 +54,8 @@ model ProjectMember {
   id        String   @id @default(cuid())
   projectId String
   userId    String
-  role      String   @default("member") // owner, manager, member
+  role      String   @default("member")
   createdAt DateTime @default(now())
-
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user      User     @relation("UserProjects", fields: [userId], references: [id], onDelete: Cascade)
 
@@ -73,22 +65,20 @@ model ProjectMember {
 }
 
 model Task {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String?
-  status      String   @default("todo") // todo, in-progress, review, completed
-  priority    String   @default("medium") // low, medium, high, critical
-  startDate   DateTime?
+  status      String    @default("todo")
+  priority    String    @default("medium")
   dueDate     DateTime?
   completedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
   assigneeId  String?
-  assignee    User?    @relation(fields: [assigneeId], references: [id])
+  startDate   DateTime?
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([assigneeId])
@@ -97,15 +87,13 @@ model Task {
 }
 
 model Team {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
   projectId   String?
-  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  
+  project     Project?     @relation(fields: [projectId], references: [id])
   members     TeamMember[]
 
   @@index([projectId])
@@ -117,7 +105,6 @@ model TeamMember {
   userId    String
   role      String   @default("member")
   createdAt DateTime @default(now())
-
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -129,7 +116,7 @@ model TeamMember {
 model Resource {
   id          String   @id @default(cuid())
   name        String
-  type        String   // equipment, material, vehicle, etc.
+  type        String
   description String?
   quantity    Int      @default(1)
   available   Int      @default(1)
@@ -141,20 +128,18 @@ model Resource {
 }
 
 model Document {
-  id          String   @id @default(cuid())
-  name        String
-  type        String   // pdf, doc, image, etc.
-  description String?
-  url         String
-  size        Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  projectId   String
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
+  id           String   @id @default(cuid())
+  name         String
+  type         String
+  url          String
+  size         Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  projectId    String
+  description  String?
   uploadedById String
-  uploadedBy   User    @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 
   @@index([projectId])
   @@index([type])
@@ -163,16 +148,14 @@ model Document {
 
 model Activity {
   id          String   @id @default(cuid())
-  type        String   // created, updated, completed, commented, etc.
+  type        String
   description String
   metadata    Json?
   createdAt   DateTime @default(now())
-
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
   projectId   String?
   project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([projectId])

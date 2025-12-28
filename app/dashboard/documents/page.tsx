@@ -22,6 +22,7 @@ import {
     User,
     Folder,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Document {
     id: string;
@@ -98,6 +99,10 @@ export default function DocumentsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             setShowAddDialog(false);
+            toast.success('Document uploaded successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to upload document');
         },
     });
 
@@ -114,6 +119,10 @@ export default function DocumentsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             setEditDocument(null);
+            toast.success('Document updated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to update document');
         },
     });
 
@@ -128,6 +137,10 @@ export default function DocumentsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['documents'] });
             setDeleteConfirm(null);
+            toast.success('Document deleted successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to delete document');
         },
     });
 

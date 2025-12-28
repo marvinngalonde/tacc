@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Search, Package, Truck, Wrench, HardHat, Plus, X, Eye, Edit, Trash2, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface Resource {
     id: string;
@@ -51,6 +52,10 @@ export default function ResourcesPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['resources'] });
             setShowAddDialog(false);
+            toast.success('Resource created successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to create resource');
         },
     });
 
@@ -67,6 +72,10 @@ export default function ResourcesPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['resources'] });
             setEditResource(null);
+            toast.success('Resource updated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to update resource');
         },
     });
 

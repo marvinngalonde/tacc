@@ -1,11 +1,43 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Settings as SettingsIcon, User, Bell, Shield, Database, Mail, Save } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
+    const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState('profile');
-    const [saved, setSaved] = useState(false);
+
+    // Fetch settings
+    const { data: settings, isLoading } = useQuery({
+        queryKey: ['settings'],
+        queryFn: async () => {
+            const response = await fetch('/api/settings');
+            if (!response.ok) throw new Error('Failed to fetch settings');
+            return response.json();
+        }
+    });
+
+    // Update settings mutation
+    const updateMutation = useMutation({
+        mutationFn: async (data: any) => {
+            const response = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) throw new Error('Failed to update settings');
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['settings'] });
+            toast.success('Settings saved successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to save settings');
+        },
+    });
 
     const tabs = [
         { id: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> },
@@ -14,10 +46,13 @@ export default function SettingsPage() {
         { id: 'system', label: 'System', icon: <Database className="w-4 h-4" /> },
     ];
 
-    const handleSave = () => {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+    const handleSave = (data: any) => {
+        updateMutation.mutate(data);
     };
+
+    if (isLoading) {
+        return <div className="text-center py-12 text-gray-500">Loading settings...</div>;
+    }
 
     return (
         <div className="space-y-6">
@@ -38,8 +73,8 @@ export default function SettingsPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
-                                        ? 'border-blue-600 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-600 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     }`}
                             >
                                 {tab.icon}
@@ -50,28 +85,10 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="p-6">
-                    {activeTab === 'profile' && <ProfileSettings />}
-                    {activeTab === 'notifications' && <NotificationSettings />}
-                    {activeTab === 'security' && <SecuritySettings />}
-                    {activeTab === 'system' && <SystemSettings />}
-                </div>
-
-                {/* Save Button */}
-                <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
-                    <div className="flex items-center justify-between">
-                        {saved && (
-                            <p className="text-sm text-green-600 font-medium">
-                                ✓ Settings saved successfully
-                            </p>
-                        )}
-                        <button
-                            onClick={handleSave}
-                            className="ml-auto flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            <Save className="w-4 h-4" />
-                            Save Changes
-                        </button>
-                    </div>
+                    {activeTab === 'profile' && <ProfileSettings settings={settings} onSave={handleSave} />}
+                    {activeTab === 'notifications' && <NotificationSettings settings={settings} onSave={handleSave} />}
+                    {activeTab === 'security' && <SecuritySettings onSave={handleSave} />}
+                    {activeTab === 'system' && <SystemSettings settings={settings} onSave={handleSave} />}
                 </div>
             </div>
         </div>

@@ -4,6 +4,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Search, MoreVertical, ChevronDown, Eye, Edit, Trash2, X, Calendar, DollarSign, MapPin, Users, CheckSquare } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+import { Can } from '@/components/auth/Can';
+import { PERMISSIONS } from '@/lib/permissions';
 
 interface Project {
     id: string;
@@ -66,8 +69,12 @@ export default function ProjectsPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['projects'] });
+            toast.success('Project deleted successfully');
             setDeleteConfirm(null);
             setOpenMenuId(null);
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to delete project');
         },
     });
 

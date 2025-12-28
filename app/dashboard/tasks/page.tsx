@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useMemo } from 'react';
 import { ChevronDown, MoreVertical, Eye, Edit, Trash2, X, Calendar, User, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface Task {
     id: string;
@@ -61,8 +62,12 @@ export default function TasksPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] });
+            toast.success('Task deleted successfully');
             setDeleteConfirm(null);
             setOpenMenuId(null);
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to delete task');
         },
     });
 

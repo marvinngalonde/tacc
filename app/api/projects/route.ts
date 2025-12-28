@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requirePermission } from '@/lib/auth-middleware';
+import { PERMISSIONS } from '@/lib/permissions';
 
 export async function GET(request: NextRequest) {
     try {

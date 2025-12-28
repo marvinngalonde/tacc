@@ -2,7 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Users, Mail, Shield, Plus, Edit, Trash2, X, Search } from 'lucide-react';
+import { Search, Plus, X, Edit, Trash2, Eye, UserCircle, Mail, Shield, Calendar, Users } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface User {
     id: string;
@@ -56,6 +57,10 @@ export default function UsersManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             setShowAddDialog(false);
+            toast.success('User created successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to create user');
         },
     });
 
@@ -73,6 +78,10 @@ export default function UsersManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             setEditUser(null);
+            toast.success('User updated successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to update user');
         },
     });
 
@@ -88,6 +97,10 @@ export default function UsersManagementPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
             setDeleteConfirm(null);
+            toast.success('User deleted successfully');
+        },
+        onError: (error: any) => {
+            toast.error(error.message || 'Failed to delete user');
         },
     });
 
